@@ -1,57 +1,64 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+using namespace std;
 
-int partition(std::vector<int>& arr, int low, int high) {
-    int pivot = arr[high];
-    int i = low - 1;
+void quickSort(vector<int> &arr, int lb, int ub) {
+    // base case
+    if(lb >= ub)
+        return;
 
-    for (int j = low; j < high; j++) {
-        if (arr[j] < pivot) {
-            i++;
-            std::swap(arr[i], arr[j]);
+    int pivot = lb, l = lb, r = ub, temp;
+
+    
+    while(l < r) {
+    
+        while(arr[l] <= arr[pivot] && l < r) {
+            l++;
+        }
+
+        while(arr[r] > arr[pivot]) {
+            r--;
+        }
+
+        if(l < r) {
+            temp = arr[l];
+            arr[l] = arr[r];
+            arr[r] = temp;
         }
     }
 
-    std::swap(arr[i + 1], arr[high]);
-    return i + 1;
-}
+    // swap arr[pivot] and arr[r]
+    temp = arr[pivot];
+    arr[pivot] = arr[r];
+    arr[r] = temp;
 
-void quick_sort(std::vector<int>& arr, int low, int high) {
-    if (low < high) {
-        int pi = partition(arr, low, high);
-        quick_sort(arr, low, pi - 1);
-        quick_sort(arr, pi + 1, high);
-    }
+    // break arr in two parts
+    quickSort(arr, lb, r-1);
+    quickSort(arr, r+1, ub);
 }
 
 int main() {
-    std::vector<int> arr;
+    ifstream inputFile("data.txt");
+    int n;
+    inputFile >> n;
 
-    std::ifstream inputFile("data.txt");
-    if(!inputFile) {
-        std::cerr << "Error opening input file." << std::endl;
-        return 1;
+    vector<int> v(n);
+    for(int i=0; i<n; i++) {
+        inputFile >> v[i];
     }
 
-    int num;
-    while(inputFile >> num) {
-        arr.push_back(num);
-    }
     inputFile.close();
 
-    quick_sort(arr, 0, arr.size() - 1);
+    quickSort(v, 0, n-1);
 
-    std::ofstream outputFile("resultQuik.txt");
-    if(!outputFile) {
-        std::cerr << "Error opening output file." << std::endl;
-        return 1;
-    }
-
-    for (auto num : arr) {
-        outputFile << num << " ";
+    ofstream outputFile("result.txt");
+    for(int i=0; i<n; i++) {
+        outputFile << v[i] << " ";
     }
     outputFile.close();
+
+    cout << "Sorting completed. Check output.txt for sorted numbers." << endl;
 
     return 0;
 }
